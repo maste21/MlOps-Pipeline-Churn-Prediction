@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1779606020695
+current_stage: None
+description: null
+last_updated_timestamp: 1779606020695
+name: rf-optuna-model
+run_id: 89ecc15282a648aeb9ecf194d3dffba7
+run_link: null
+source: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/89ecc15282a648aeb9ecf194d3dffba7/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/89ecc15282a648aeb9ecf194d3dffba7/artifacts/model
+user_id: null
+version: 1

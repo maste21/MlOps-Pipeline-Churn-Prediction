@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/8bf2634a42de49f1a1efc0244fb580f4/artifacts
+end_time: 1779623070884
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 8bf2634a42de49f1a1efc0244fb580f4
+run_name: gentle-gull-212
+run_uuid: 8bf2634a42de49f1a1efc0244fb580f4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779623070758
+status: 3
+tags: []
+user_id: Arunkumar

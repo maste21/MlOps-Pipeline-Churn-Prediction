@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/8ed8d8d984754c96b9d6e84b43e808b2/artifacts
+end_time: 1779623045698
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 8ed8d8d984754c96b9d6e84b43e808b2
+run_name: carefree-hare-751
+run_uuid: 8ed8d8d984754c96b9d6e84b43e808b2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779623045617
+status: 3
+tags: []
+user_id: Arunkumar

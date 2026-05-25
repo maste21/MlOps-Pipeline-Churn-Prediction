@@ -1,0 +1,15 @@
+venv/
+.env
+__pycache__/
+.coverage
+.vscode/
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+crash.log
+terraform.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

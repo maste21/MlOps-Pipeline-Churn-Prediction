@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/8f085510dc7c458898de1b13c5b03f1b/artifacts
+end_time: 1779605964093
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 8f085510dc7c458898de1b13c5b03f1b
+run_name: amusing-eel-966
+run_uuid: 8f085510dc7c458898de1b13c5b03f1b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779605964033
+status: 3
+tags: []
+user_id: Arunkumar

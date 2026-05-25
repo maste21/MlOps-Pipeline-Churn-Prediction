@@ -1,0 +1,6 @@
+artifact_location: file:///C:/Users/Arunkumar/churn-prediction/mlruns/515350820192426497
+creation_time: 1779623149833
+experiment_id: '515350820192426497'
+last_update_time: 1779623149833
+lifecycle_stage: active
+name: model-evaluation

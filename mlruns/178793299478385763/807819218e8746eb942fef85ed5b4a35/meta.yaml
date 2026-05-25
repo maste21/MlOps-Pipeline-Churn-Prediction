@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/807819218e8746eb942fef85ed5b4a35/artifacts
+end_time: 1779606003785
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 807819218e8746eb942fef85ed5b4a35
+run_name: intrigued-crow-960
+run_uuid: 807819218e8746eb942fef85ed5b4a35
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779606003723
+status: 3
+tags: []
+user_id: Arunkumar

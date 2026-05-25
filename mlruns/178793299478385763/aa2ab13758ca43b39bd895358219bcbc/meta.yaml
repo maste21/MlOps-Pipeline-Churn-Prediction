@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/aa2ab13758ca43b39bd895358219bcbc/artifacts
+end_time: 1779605962190
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: aa2ab13758ca43b39bd895358219bcbc
+run_name: brawny-mouse-330
+run_uuid: aa2ab13758ca43b39bd895358219bcbc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779605962149
+status: 3
+tags: []
+user_id: Arunkumar

@@ -1,0 +1,36 @@
+pandas==2.3.0
+numpy==1.26.4
+scikit-learn==1.7.0
+jupyter==1.1.1
+matplotlib==3.10.3
+seaborn==0.13.2
+python-box
+ensure
+python-dotenv
+mlflow==2.11.3
+optuna
+dvc
+dvc_s3
+streamlit
+psycopg
+psycopg_binary
+
+# monitoring
+evidently
+
+# orchestration
+prefect==2.10.13
+pydantic==1.10.13
+griffe<0.42
+anyio==3.7.1
+
+# ── Enhancements ──────────────────────────────────────────────────────────────
+# XGBoost model (Objective 02)
+xgboost==2.1.1
+
+# FastAPI REST endpoint (Objective 05)
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+
+# SHAP explainability (Slide 3 / 9 — key churn-driving factors)
+shap==0.45.1

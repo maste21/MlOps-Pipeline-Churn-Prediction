@@ -1,0 +1,123 @@
+volumes:
+  grafana_data: {}
+
+networks:
+  front-tier:
+  back-tier:
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: test
+    ports:
+      - "5432:5432"
+    networks:
+      - back-tier
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - back-tier
+      - front-tier
+    depends_on:
+      - db
+
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/grafana_datasources.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./grafana/provisioning/grafana_dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./grafana/dashboards:/opt/grafana/dashboards
+      - ./grafana/alerting:/etc/grafana/provisioning/alerting
+      - grafana_data:/var/lib/grafana
+    networks:
+      - back-tier
+      - front-tier
+    restart: always
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.3
+    # ── Fixed relative path bug by enforcing absolute 4-slash SQLite URI ──
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5050
+      --backend-store-uri sqlite:////mlflow-artifacts/mlflow.db
+      --default-artifact-root /mlflow-artifacts
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./mlflow:/mlflow-artifacts
+    networks:
+      - back-tier
+
+  prefect:
+    image: prefecthq/prefect:2.10.13-python3.10
+    command: prefect server start --host 0.0.0.0
+    ports:
+      - "4200:4200"
+    networks:
+      - back-tier
+
+  # ── Existing Streamlit dashboard (Aligned volume context) ───────────────────
+  churn-prediction-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - MLFLOW_TRACKING_URI=http://mlflow:5050
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+      - ./mlflow:/mlflow-artifacts
+    depends_on:
+      - prefect
+      - mlflow
+      - db
+    networks:
+      - front-tier
+      - back-tier
+
+  # ── Enhancement: FastAPI REST endpoint (Aligned volume context) ──────────────
+  churn-prediction-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Override the default Streamlit entrypoint to start FastAPI instead
+    entrypoint: ["uvicorn", "src.inference.fastapi_app:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5050
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+    volumes:
+      - .:/app
+      - ./mlflow:/mlflow-artifacts
+    ports:
+      - "8000:8000"          # REST API  →  http://localhost:8000
+                             # Swagger UI →  http://localhost:8000/docs
+    depends_on:
+      - mlflow
+      - db
+    networks:
+      - front-tier
+      - back-tier
+    restart: always

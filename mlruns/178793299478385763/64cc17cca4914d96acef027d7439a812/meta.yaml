@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/64cc17cca4914d96acef027d7439a812/artifacts
+end_time: 1779623114332
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 64cc17cca4914d96acef027d7439a812
+run_name: likeable-moose-961
+run_uuid: 64cc17cca4914d96acef027d7439a812
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779623114239
+status: 3
+tags: []
+user_id: Arunkumar
