@@ -1,5 +1,6 @@
 import json
 import os
+import joblib
 import tempfile
 from functools import partial
 from pathlib import Path
@@ -183,5 +184,10 @@ def train_model(experiment_name: str, objective_func, model_type: str):
             artifact_path="model",
             registered_model_name=registered_name,
         )
+
+        # Save local backup model for Render deployment
+        os.makedirs("models", exist_ok=True)
+        joblib.dump(final_pipeline, "models/model.pkl")
+        logger.info("Local model saved at models/model.pkl")
 
     mlflow.end_run()
