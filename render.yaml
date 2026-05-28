@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: churn-fastapi
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+
+  - type: web
+    name: churn-streamlit
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
