@@ -9,6 +9,7 @@ from mlflow.tracking import MlflowClient
 from src.utils.common import read_yaml
 from src.utils.logger import logger
 
+
 def load_model():
     try:
         logger.info("Trying to load model from MLflow registry...")
@@ -16,7 +17,9 @@ def load_model():
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
         config = read_yaml(Path("src/config/config.yaml"))
         client = MlflowClient()
-        latest_version = client.get_latest_versions(config.model_registry.name)[0].version
+        latest_version = client.get_latest_versions(config.model_registry.name)[
+            0
+        ].version
         model_uri = f"models:/{config.model_registry.name}/{latest_version}"
         logger.info("Trying to load model from MLflow: %s", model_uri)
         model = mlflow.sklearn.load_model(model_uri)
@@ -29,6 +32,7 @@ def load_model():
         model = joblib.load(local_model_path)
         logger.info("Local fallback model loaded successfully")
         return model
+
 
 def predict(input_data: dict):
     model = load_model()
