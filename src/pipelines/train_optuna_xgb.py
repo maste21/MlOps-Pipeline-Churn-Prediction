@@ -27,7 +27,7 @@ def objective(trial, X_train, y_train, X_val, y_val, train_df, target_column):
             "scale_pos_weight", default_spw * 0.5, default_spw * 2.0
         ),
         "random_state": 42,
-        "eval_metric": "logloss"
+        "eval_metric": "logloss",
         # "use_label_encoder": False,
     }
 
