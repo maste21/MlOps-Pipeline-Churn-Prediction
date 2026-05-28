@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
-*.pkl
+# *.pkl
 *.csv
 *.json
 *.log
@@ -8,7 +8,7 @@ mlruns/
 htmlcov/
 artifacts/
 outputs/
-models/
+# models/
 data/processed/
 data/split/
 venv/
