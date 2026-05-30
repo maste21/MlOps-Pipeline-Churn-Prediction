@@ -15,14 +15,10 @@ def ingest_data(data_path: Path, output_path: Path) -> None:
     logger.info("Loading data from %s", data_path)
     df = pd.read_csv(data_path)
 
-    # Clean TotalCharges (some have ' ')
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
     df.dropna(subset=["TotalCharges"], inplace=True)
 
-    # Map target variable
     df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
-
-    # Ensure output folder exists
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)

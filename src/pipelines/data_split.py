@@ -16,10 +16,7 @@ def split_and_save_data(
     val_size: float = 0.2,
     random_state: int = 42,
 ) -> None:
-    """
-    Splits the dataset into train, validation, and test sets with stratification.
-    Saves the resulting files to the output directory.
-    """
+
     logger.info("Reading cleaned data from %s", input_path)
     df = pd.read_csv(input_path)
 

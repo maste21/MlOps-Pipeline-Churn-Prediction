@@ -15,10 +15,8 @@ def build_preprocessing_pipeline(df: pd.DataFrame, target_column: str):
 
     logger.info("Building preprocessing pipeline...")
 
-    # Drop target for feature analysis
     X = df.drop(columns=[target_column])
 
-    # Split column types
     num_features = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
     cat_features = X.select_dtypes(include=["object"]).columns.tolist()
 

@@ -1,15 +1,12 @@
 #!/bin/bash
 
-# === CONFIGURATION ===
-#  Replace these values with your own if needed
 AWS_REGION="eu-central-1"
-AWS_ACCOUNT_ID="123456789012"  # Replace with your actual AWS Account ID
+AWS_ACCOUNT_ID="123456789012" 
 REPO_NAME="churn-app"
 IMAGE_NAME="churn-app"
 TAG="latest"
-TERRAFORM_DIR="terraform"  # where your .tf files are
+TERRAFORM_DIR="terraform" 
 
-# === AUTO-GENERATED VALUES ===
 ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:${TAG}"
 
 echo "STEP 0: Ensure ECR repository exists"

@@ -46,7 +46,6 @@ services:
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.11.3
-    # ── Fixed relative path bug by enforcing absolute 4-slash SQLite URI ──
     command: >
       mlflow server
       --host 0.0.0.0
@@ -68,7 +67,6 @@ services:
     networks:
       - back-tier
 
-  # ── Existing Streamlit dashboard (Aligned volume context) ───────────────────
   churn-prediction-app:
     build:
       context: .
@@ -94,12 +92,10 @@ services:
       - front-tier
       - back-tier
 
-  # ── Enhancement: FastAPI REST endpoint (Aligned volume context) ──────────────
   churn-prediction-api:
     build:
       context: .
       dockerfile: Dockerfile
-    # Override the default Streamlit entrypoint to start FastAPI instead
     entrypoint: ["uvicorn", "src.inference.fastapi_app:app", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5050

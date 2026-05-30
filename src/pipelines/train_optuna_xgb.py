@@ -10,7 +10,6 @@ from src.utils.logger import logger
 
 
 def objective(trial, X_train, y_train, X_val, y_val, train_df, target_column):
-    # Class imbalance ratio for scale_pos_weight (replaces class_weight="balanced")
     neg = (y_train == 0).sum()
     pos = (y_train == 1).sum()
     default_spw = round(neg / pos, 2)
@@ -22,13 +21,11 @@ def objective(trial, X_train, y_train, X_val, y_val, train_df, target_column):
         "subsample": trial.suggest_float("subsample", 0.6, 1.0),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
         "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
-        # scale_pos_weight handles class imbalance in XGBoost
         "scale_pos_weight": trial.suggest_float(
             "scale_pos_weight", default_spw * 0.5, default_spw * 2.0
         ),
         "random_state": 42,
         "eval_metric": "logloss",
-        # "use_label_encoder": False,
     }
 
     preprocessor = build_preprocessing_pipeline(train_df, target_column)

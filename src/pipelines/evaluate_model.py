@@ -19,7 +19,6 @@ from src.utils.logger import logger
 
 
 def evaluate_model(config_path: Path):
-    '''Evaluate the model using the test dataset.'''
     logger.info("Starting model evaluation")
     load_dotenv()
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))

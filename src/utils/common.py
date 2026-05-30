@@ -51,18 +51,12 @@ def prepare_train_val_data(train_path: str, val_path: str, target: str):
 
 
 def _log_shap_importance(final_pipeline, X_train, top_n: int = 10) -> dict:
-    """
-    Compute SHAP mean absolute values for top_n features.
-    Logs each as an MLflow metric and saves a JSON artifact.
-    Returns the top_features dict so callers can use it too.
-    """
     try:
         preprocessor_fitted = final_pipeline.named_steps["preprocessor"]
         X_train_transformed = preprocessor_fitted.transform(X_train)
         inner_model = final_pipeline.named_steps["model"]
 
         explainer = shap.Explainer(inner_model, X_train_transformed)
-        # Sample 200 rows for speed; increase for higher fidelity
         shap_values = explainer(X_train_transformed[:200])
 
         feature_names = preprocessor_fitted.get_feature_names_out()
@@ -77,12 +71,10 @@ def _log_shap_importance(final_pipeline, X_train, top_n: int = 10) -> dict:
 
         logger.info("Top %d SHAP features: %s", top_n, top_features)
 
-        # Log each feature as an MLflow metric
         for feat, val in top_features.items():
             safe_key = ("shap_" + feat.replace(" ", "_"))[:50]
             mlflow.log_metric(safe_key, val)
 
-        # Save as JSON artifact (FastAPI reads this at inference time)
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
             json.dump(top_features, tmp)
             tmp_path = tmp.name
@@ -136,11 +128,9 @@ def train_model(experiment_name: str, objective_func, model_type: str):
         model = RandomForestClassifier(class_weight="balanced", **best_params)
         registered_name = "rf-optuna-model"
     elif model_type == "logistig regression":
-        # Note: typo preserved intentionally to match original codebase
         model = LogisticRegression(class_weight="balanced", **best_params)
         registered_name = "logreg-optuna-model"
     elif model_type == "xgboost":
-        # XGBoost uses scale_pos_weight (already tuned in objective)
         model = XGBClassifier(**best_params)
         registered_name = "xgb-optuna-model"
     else:
@@ -176,7 +166,6 @@ def train_model(experiment_name: str, objective_func, model_type: str):
             }
         )
 
-        # ── SHAP: log top-10 feature importances ────────────────────────────
         _log_shap_importance(final_pipeline, X_train, top_n=10)
 
         mlflow.sklearn.log_model(
@@ -185,7 +174,6 @@ def train_model(experiment_name: str, objective_func, model_type: str):
             registered_model_name=registered_name,
         )
 
-        # Save local backup model for Render deployment
         os.makedirs("models", exist_ok=True)
         joblib.dump(final_pipeline, "models/model.pkl")
         logger.info("Local model saved at models/model.pkl")

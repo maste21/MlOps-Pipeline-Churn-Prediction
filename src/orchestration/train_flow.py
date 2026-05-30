@@ -7,7 +7,6 @@ from prefect import flow, task
 def get_env_with_mlflow():
     """Helper to forward the system environment variables along with MLflow configuration."""
     env = os.environ.copy()
-    # Explicitly force the subprocess to target the exact shared container endpoint
     env["MLFLOW_TRACKING_URI"] = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5050")
     return env
 
@@ -55,7 +54,6 @@ def training_pipeline():
     ingest_data()
     split_data()
 
-    # Both models run concurrently after data splits are initialized
     rf = train_random_forest.submit()
     xgb = train_xgboost.submit()
 
