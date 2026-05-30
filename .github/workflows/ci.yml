@@ -13,25 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ---------------------------------------------------
-      # Checkout
-      # ---------------------------------------------------
-
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      # ---------------------------------------------------
-      # Python Setup
-      # ---------------------------------------------------
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-
-      # ---------------------------------------------------
-      # Install Dependencies
-      # ---------------------------------------------------
 
       - name: Install dependencies
         run: |
@@ -39,16 +27,8 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
-      # ---------------------------------------------------
-      # Docker Build Check
-      # ---------------------------------------------------
-
       - name: Build Docker containers
         run: docker compose build
-
-      # ---------------------------------------------------
-      # Formatting Checks
-      # ---------------------------------------------------
 
       - name: Check formatting with black
         run: black --check src/ tests/
@@ -60,25 +40,23 @@ jobs:
         run: |
           pylint src/ tests/ --disable=all --enable=E,F
 
-      # ---------------------------------------------------
-      # Unit Tests
-      # ---------------------------------------------------
-
       - name: Run tests
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5050
         run: pytest
 
       - name: Run tests with coverage
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5050
         run: |
           coverage run -m pytest
           coverage report
 
       - name: Run tests with coverage report
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5050
         run: |
           pytest --cov=src --cov-report=term --cov-report=xml
-
-      # ---------------------------------------------------
-      # Docker Compose Startup Test
-      # ---------------------------------------------------
 
       - name: Start Docker services
         run: |
@@ -87,10 +65,6 @@ jobs:
 
       - name: Check running containers
         run: docker ps
-
-      # ---------------------------------------------------
-      # FastAPI Smoke Test
-      # ---------------------------------------------------
 
       - name: Wait for FastAPI startup
         run: |
@@ -102,7 +76,6 @@ jobs:
             echo "Waiting for FastAPI..."
             sleep 10
           done
-
           echo "FastAPI failed to start"
           docker compose logs
           exit 1
@@ -110,10 +83,6 @@ jobs:
       - name: Test FastAPI health endpoint
         run: |
           curl -f http://127.0.0.1:8000/health
-
-      # ---------------------------------------------------
-      # Streamlit Smoke Test
-      # ---------------------------------------------------
 
       - name: Wait for Streamlit startup
         run: |
@@ -125,7 +94,6 @@ jobs:
             echo "Waiting for Streamlit..."
             sleep 10
           done
-
           echo "Streamlit failed to start"
           docker compose logs
           exit 1
@@ -133,10 +101,6 @@ jobs:
       - name: Check Streamlit app
         run: |
           curl -f http://127.0.0.1:8501
-
-      # ---------------------------------------------------
-      # Coverage Badge
-      # ---------------------------------------------------
 
       - name: Generate coverage badge
         run: |
@@ -149,19 +113,11 @@ jobs:
           name: coverage-badge
           path: badges/coverage.svg
 
-      # ---------------------------------------------------
-      # GitHub Actions Git Config
-      # ---------------------------------------------------
-
       - name: Setup Git for GitHub Actions
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-
-      # ---------------------------------------------------
-      # Commit Coverage Badge
-      # ---------------------------------------------------
 
       - name: Commit coverage badge
         if: github.ref == 'refs/heads/main'
