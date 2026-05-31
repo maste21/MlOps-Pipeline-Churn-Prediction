@@ -5,6 +5,7 @@ from functools import partial
 from pathlib import Path
 
 import joblib
+import mlflow
 import mlflow.sklearn
 import optuna
 import pandas as pd
@@ -13,6 +14,7 @@ import yaml
 from box import ConfigBox
 from dotenv import load_dotenv
 from ensure import ensure_annotations
+from lightgbm import LGBMClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
@@ -22,10 +24,10 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
 
-import mlflow
 from src.pipelines.data_preprocessing import build_preprocessing_pipeline
 from src.utils.logger import logger
 
@@ -118,7 +120,7 @@ def train_model(experiment_name: str, objective_func, model_type: str):
     study.optimize(objective_func, n_trials=30)
     logger.info("Best params: %s", study.best_params)
 
-    # ── Final model training ─────────────────────────────────────────────────
+    # ── Final model training ─────────
     best_params = study.best_params
     best_params["random_state"] = 42
 
@@ -127,12 +129,31 @@ def train_model(experiment_name: str, objective_func, model_type: str):
     if model_type == "randomforest":
         model = RandomForestClassifier(class_weight="balanced", **best_params)
         registered_name = "rf-optuna-model"
+
     elif model_type == "logistig regression":
         model = LogisticRegression(class_weight="balanced", **best_params)
         registered_name = "logreg-optuna-model"
+
     elif model_type == "xgboost":
         model = XGBClassifier(**best_params)
         registered_name = "xgb-optuna-model"
+
+    elif model_type == "lightgbm":
+        best_params["verbose"] = -1
+        model = LGBMClassifier(**best_params)
+        registered_name = "lgbm-optuna-model"
+
+    elif model_type == "mlp":
+        n_layers = best_params.pop("n_layers", 1)
+        units = best_params.pop("units_per_layer", 64)
+        best_params["hidden_layer_sizes"] = tuple([units] * n_layers)
+        best_params["max_iter"] = 500
+        best_params["early_stopping"] = True
+        best_params["validation_fraction"] = 0.1
+        best_params["n_iter_no_change"] = 15
+        model = MLPClassifier(**best_params)
+        registered_name = "mlp-optuna-model"
+
     else:
         raise ValueError(f"Model type '{model_type}' not supported")
 
@@ -155,14 +176,16 @@ def train_model(experiment_name: str, objective_func, model_type: str):
     logger.info("Final metrics — F1: %.4f, ROC AUC: %.4f", f1, roc_auc)
 
     with mlflow.start_run():
-        mlflow.log_params(best_params)
+        mlflow.log_params(
+            {k: str(v) for k, v in best_params.items()} 
+        )
         mlflow.log_metrics(
             {
-                "accuracy": acc,
+                "accuracy":  acc,
                 "precision": precision,
-                "recall": recall,
-                "f1": f1,
-                "roc_auc": roc_auc,
+                "recall":    recall,
+                "f1":        f1,
+                "roc_auc":   roc_auc,
             }
         )
 

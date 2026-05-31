@@ -32,9 +32,38 @@ def train_random_forest():
 
 @task(log_prints=True)
 def train_xgboost():
-    """Enhancement: XGBoost with Optuna tuning + SHAP logging."""
     subprocess.run(
         ["python", "-m", "src.pipelines.train_optuna_xgb"],
+        env=get_env_with_mlflow(),
+        check=True,
+    )
+
+
+@task(log_prints=True)
+def train_lightgbm():
+    """LightGBM — fastest gradient boosting, best for telecom churn benchmarks."""
+    subprocess.run(
+        ["python", "-m", "src.pipelines.train_optuna_lgbm"],
+        env=get_env_with_mlflow(),
+        check=True,
+    )
+
+
+@task(log_prints=True)
+def train_mlp():
+    """MLP Neural Network — sklearn, no extra dependencies, pure tabular NN."""
+    subprocess.run(
+        ["python", "-m", "src.pipelines.train_optuna_mlp"],
+        env=get_env_with_mlflow(),
+        check=True,
+    )
+
+
+@task(log_prints=True)
+def train_ensemble():
+    """Soft Voting Ensemble — combines all trained models for best accuracy."""
+    subprocess.run(
+        ["python", "-m", "src.pipelines.train_ensemble"],
         env=get_env_with_mlflow(),
         check=True,
     )
@@ -54,11 +83,20 @@ def training_pipeline():
     ingest_data()
     split_data()
 
-    rf = train_random_forest.submit()
-    xgb = train_xgboost.submit()
+    # All 5 base models run in parallel
+    rf   = train_random_forest.submit()
+    xgb  = train_xgboost.submit()
+    lgbm = train_lightgbm.submit()
+    mlp  = train_mlp.submit()
 
+    # Wait for all base models before building ensemble
     rf.result()
     xgb.result()
+    lgbm.result()
+    mlp.result()
+
+    # Ensemble after all base models are registered
+    train_ensemble()
 
     evaluate_model()
 

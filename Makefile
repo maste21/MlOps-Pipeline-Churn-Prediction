@@ -1,11 +1,11 @@
-.PHONY: all ingest split train_logreg train_rf train_all evaluate \
-        test quality_checks build integration_test publish setup \
-        precommit_check prefect_deploy
+.PHONY: all ingest split train_logreg train_rf train_xgb train_lgbm train_mlp \
+        train_all train_ensemble evaluate test quality_checks build \
+        integration_test publish setup precommit_check prefect_deploy
 
 # --- ML PIPELINE --
 
-# Run the full pipeline: data ingestion -> split -> training both models
-all: ingest split train_all
+# Run the full pipeline: data ingestion -> split -> all models -> ensemble
+all: ingest split train_all train_ensemble evaluate
 
 # Download or ingest raw data
 ingest:
@@ -23,8 +23,24 @@ train_logreg:
 train_rf:
 	PYTHONPATH=. python src/pipelines/train_optuna_rf.py
 
-# Run both training scripts
-train_all: train_logreg train_rf
+# Train XGBoost with Optuna and track with MLflow
+train_xgb:
+	PYTHONPATH=. python src/pipelines/train_optuna_xgb.py
+
+# Train LightGBM with Optuna and track with MLflow
+train_lgbm:
+	PYTHONPATH=. python src/pipelines/train_optuna_lgbm.py
+
+# Train MLP (Neural Network) with Optuna and track with MLflow
+train_mlp:
+	PYTHONPATH=. python src/pipelines/train_optuna_mlp.py
+
+# Run all base model training scripts
+train_all: train_logreg train_rf train_xgb train_lgbm train_mlp
+
+# Build Soft Voting Ensemble from all registered models (run after train_all)
+train_ensemble:
+	PYTHONPATH=. python src/pipelines/train_ensemble.py
 
 # Evaluate the selected model from MLflow on the test set
 evaluate:
@@ -51,7 +67,6 @@ precommit_check: quality_checks test
 # Prefect deployment
 prefect_deploy:
 	PYTHONPATH=. python src/orchestration/create_deployment.py
-
 
 # Initial setup
 setup:
