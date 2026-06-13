@@ -9,7 +9,7 @@ from src.utils.logger import logger
 
 def ingest_data(data_path: Path, output_path: Path) -> None:
     """
-    Ingests data from CSV file and save the processed data.
+    Ingests data from CSV file and save the processed data. 
     """
 
     logger.info("Loading data from %s", data_path)
