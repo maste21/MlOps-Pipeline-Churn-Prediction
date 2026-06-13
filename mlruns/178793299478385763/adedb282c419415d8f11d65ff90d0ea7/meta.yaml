@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/adedb282c419415d8f11d65ff90d0ea7/artifacts
+end_time: 1779605977148
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: adedb282c419415d8f11d65ff90d0ea7
+run_name: fortunate-ant-11
+run_uuid: adedb282c419415d8f11d65ff90d0ea7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779605977054
+status: 3
+tags: []
+user_id: Arunkumar

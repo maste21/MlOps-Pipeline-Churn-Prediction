@@ -1,0 +1,144 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: daily-monitoring
+    folder: model-monitoring
+    interval: 1d
+    rules:
+      - uid: drift-share-alert-001
+        title: "Dataset Drift Score > 30%"
+        condition: C
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false
+        annotations:
+          summary: "⚠️ Data drift detected — share of drifted columns > 30%"
+          description: >
+            Dataset drift share exceeded 30% threshold. The share_of_drifted_columns from the latest Evidently DatasetDriftMetric report is above 0.3. Drift-triggered retraining will be initiated automatically by the monitoring Prefect flow.
+        labels:
+          severity: critical
+          team: mlops
+        data:
+          - refId: A
+            relativeTimeRange: { from: 604800, to: 0 }
+            datasourceUid: PCC52D03280B7034C
+            model:
+              editorMode: code
+              format: time_series
+              rawQuery: true
+              type: postgres
+              rawSql: |
+                SELECT
+                  timestamp AS time,
+                  (elem->'result'->>'share_of_drifted_columns')::float AS drift_share
+                FROM evidently_reports,
+                LATERAL jsonb_array_elements(report_json->'metrics') AS elem
+                WHERE elem->>'metric' = 'DatasetDriftMetric'
+                ORDER BY time;
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              reducer: last
+              expression: A
+              refId: B
+          - refId: C
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: { type: gt, params: [0.3] }
+                  operator: { type: and }
+                  query: { params: [C] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: ferjim8ao3lkwb
+        title: "Missing value rate > 10%"
+        condition: C
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false
+        annotations:
+          summary: "Missing value rate exceeded 10%"
+          description: >
+            The share_of_missing_values from the latest Evidently DatasetMissingValuesMetric report is above 0.1.
+        labels:
+          severity: warning
+          team: mlops
+        data:
+          - refId: A
+            relativeTimeRange: { from: 604800, to: 0 }
+            datasourceUid: PCC52D03280B7034C
+            model:
+              editorMode: code
+              format: time_series
+              rawQuery: true
+              type: postgres
+              rawSql: |
+                SELECT
+                  timestamp AS time,
+                  (elem->'result'->'current'->>'share_of_missing_values')::float AS missing_share
+                FROM evidently_reports,
+                LATERAL jsonb_array_elements(report_json->'metrics') AS elem
+                WHERE elem->>'metric' = 'DatasetMissingValuesMetric'
+                ORDER BY time;
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              reducer: last
+              expression: A
+              refId: B
+          - refId: C
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: { type: gt, params: [0.1] }
+                  operator: { type: and }
+                  query: { params: [C] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+contactPoints:
+  - orgId: 1
+    name: mlops-email-alerts
+    receivers:
+      - uid: mlops-email-001
+        type: email
+        settings:
+          addresses: arunpandi984353@gmail.com
+          singleEmail: false
+          message: |
+            {{ len .Alerts.Firing }} MLOps alert(s) firing.
+
+            {{ range .Alerts.Firing }}
+            Alert     : {{ .Labels.alertname }}
+            Summary   : {{ .Annotations.summary }}
+            Description: {{ .Annotations.description }}
+            Value     : {{ index .Values "B" }}
+            Started   : {{ .StartsAt }}
+            {{ end }}
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: mlops-email-alerts # Fallback root receiver
+    group_by: [alertname, severity]
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 12h
+    routes:
+      - receiver: mlops-email-alerts
+        matchers:
+          - team = mlops

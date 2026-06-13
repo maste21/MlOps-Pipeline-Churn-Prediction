@@ -1,0 +1,12 @@
+{
+  "cat__Contract_Month-to-month": 0.6335,
+  "num__tenure": 0.4732,
+  "num__MonthlyCharges": 0.3251,
+  "cat__OnlineSecurity_No": 0.2603,
+  "num__TotalCharges": 0.2488,
+  "cat__Contract_Two year": 0.2205,
+  "cat__TechSupport_No": 0.2086,
+  "cat__InternetService_Fiber optic": 0.2068,
+  "cat__MultipleLines_No": 0.1795,
+  "cat__PaymentMethod_Electronic check": 0.1117
+}

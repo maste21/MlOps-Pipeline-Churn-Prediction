@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/aadfa9e38db84e6196751d7b34df728b/artifacts
+end_time: 1779605992138
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: aadfa9e38db84e6196751d7b34df728b
+run_name: handsome-carp-430
+run_uuid: aadfa9e38db84e6196751d7b34df728b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779605992078
+status: 3
+tags: []
+user_id: Arunkumar

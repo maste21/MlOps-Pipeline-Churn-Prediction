@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/5b3b8f34601c4f8d844e3f147652aea1/artifacts
+end_time: 1779623044638
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 5b3b8f34601c4f8d844e3f147652aea1
+run_name: salty-roo-912
+run_uuid: 5b3b8f34601c4f8d844e3f147652aea1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779623044513
+status: 3
+tags: []
+user_id: Arunkumar

@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763/26f03c2d1d214cbaa2a30f58604a22a4/artifacts
+end_time: 1779623088652
+entry_point_name: ''
+experiment_id: '178793299478385763'
+lifecycle_stage: active
+run_id: 26f03c2d1d214cbaa2a30f58604a22a4
+run_name: honorable-owl-378
+run_uuid: 26f03c2d1d214cbaa2a30f58604a22a4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779623088484
+status: 3
+tags: []
+user_id: Arunkumar

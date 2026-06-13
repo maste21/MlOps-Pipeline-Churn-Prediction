@@ -1,0 +1,6 @@
+artifact_location: file:///C:/Users/Arunkumar/churn-prediction/mlruns/178793299478385763
+creation_time: 1779605959661
+experiment_id: '178793299478385763'
+last_update_time: 1779605959661
+lifecycle_stage: active
+name: optuna-randomforest
