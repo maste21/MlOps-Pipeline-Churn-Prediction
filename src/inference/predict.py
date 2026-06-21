@@ -15,8 +15,8 @@ from src.utils.logger import logger
 
 CURRENT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = CURRENT_DIR.parent.parent
-LOCAL_MODEL_PATH = CURRENT_DIR / "models" / "model.pkl"
-LOCAL_SHAP_PATH = CURRENT_DIR / "models" / "shap_importance.json"
+LOCAL_MODEL_PATH = CURRENT_DIR / "model.pkl"
+LOCAL_SHAP_PATH = CURRENT_DIR / "shap_importance.json"
 
 GLOBAL_MODEL = None
 GLOBAL_MODEL_VERSION = "not_loaded_yet"
