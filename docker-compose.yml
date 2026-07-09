@@ -74,6 +74,32 @@ services:
     networks:
       - back-tier
 
+  prefect-agent:
+    image: prefecthq/prefect:2.10.13-python3.10
+    container_name: churn-prediction-agent
+    command: prefect agent start -q default
+    working_dir: /app
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+      - PYTHONPATH=/app
+      - MLFLOW_TRACKING_URI=http://mlflow:5050
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+    volumes:
+      - .:/app
+      - ./mlflow:/mlflow-artifacts
+    depends_on:
+      - prefect
+      - mlflow
+      - db
+    networks:
+      - back-tier
+      - front-tier
+    restart: always
+
   churn-prediction-app:
     build:
       context: .
@@ -117,8 +143,7 @@ services:
       - .:/app
       - ./mlflow:/mlflow-artifacts
     ports:
-      - "8000:8000"          # REST API  →  http://localhost:8000
-                             # Swagger UI →  http://localhost:8000/docs
+      - "8000:8000"
     depends_on:
       - mlflow
       - db

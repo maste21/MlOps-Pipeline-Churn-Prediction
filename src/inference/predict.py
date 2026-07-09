@@ -34,6 +34,26 @@ _FALLBACK_MODEL_NAMES = [
 def load_model():
     global GLOBAL_MODEL_VERSION
 
+    USE_LOCAL_FALLBACK_ONLY = False
+
+    if USE_LOCAL_FALLBACK_ONLY:
+        logger.info(
+            "Manual override active. Skipping MLflow lookup to use local packaged binaries."
+        )
+        logger.info("Loading local fallback model from: %s", LOCAL_MODEL_PATH)
+
+        if not LOCAL_MODEL_PATH.exists():
+            raise FileNotFoundError(
+                f"Critical Error: Fallback model not found at {LOCAL_MODEL_PATH}. "
+                "Run training pipeline first."
+            )
+
+        model = joblib.load(LOCAL_MODEL_PATH)
+        logger.info("Local fallback model loaded successfully.")
+        GLOBAL_MODEL_VERSION = "local://models/model.pkl"
+        _load_shap_features()
+        return model
+
     try:
         logger.info("Trying to load model from MLflow registry...")
         load_dotenv()
@@ -53,16 +73,23 @@ def load_model():
 
         for model_name in model_names_to_try:
             try:
-                versions = client.get_latest_versions(model_name)
-                if not versions:
+                all_versions = client.search_model_versions(f"name='{model_name}'")
+                if not all_versions:
                     logger.info("'%s' not registered yet — trying next.", model_name)
                     continue
 
-                latest = sorted(versions, key=lambda v: int(v.version), reverse=True)[0]
+                latest = sorted(
+                    all_versions, key=lambda v: int(v.version), reverse=True
+                )[0]
                 model_uri = f"models:/{model_name}/{latest.version}"
+
                 logger.info("Loading model from MLflow: %s", model_uri)
                 model = mlflow.sklearn.load_model(model_uri)
-                logger.info("MLflow model loaded successfully: %s", model_name)
+                logger.info(
+                    "MLflow model loaded successfully: %s (v%s)",
+                    model_name,
+                    latest.version,
+                )
                 GLOBAL_MODEL_VERSION = f"mlflow://{model_name}/v{latest.version}"
                 _load_shap_features()
                 return model
@@ -95,7 +122,7 @@ def load_model():
 
 def _load_shap_features():
     """Populate GLOBAL_SHAP_FEATURES from local JSON or MLflow artifact."""
-    global GLOBAL_SHAP_FEATURES  # noqa: PLW0603
+    global GLOBAL_SHAP_FEATURES
 
     try:
         if LOCAL_SHAP_PATH.exists():
@@ -110,9 +137,10 @@ def _load_shap_features():
         client = MlflowClient()
         config = read_yaml(Path("src/config/config.yaml"))
         model_name = config.model_registry.name
-        versions = client.get_latest_versions(model_name)
-        if versions:
-            latest = sorted(versions, key=lambda v: int(v.version), reverse=True)[0]
+
+        all_versions = client.search_model_versions(f"name='{model_name}'")
+        if all_versions:
+            latest = sorted(all_versions, key=lambda v: int(v.version), reverse=True)[0]
             run_id = latest.run_id
             artifacts = client.list_artifacts(run_id, path="shap")
             shap_artifact = next(
