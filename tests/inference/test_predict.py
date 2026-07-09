@@ -9,7 +9,10 @@ from src.inference.predict import load_model, predict
 @patch("src.inference.predict.read_yaml")
 @patch("src.inference.predict.mlflow.sklearn.load_model")
 @patch("src.inference.predict.MlflowClient")
-def test_load_model(mock_mlflow_client, mock_sklearn_load, mock_read_yaml):
+@patch("src.inference.predict._load_shap_features")
+def test_load_model(
+    mock_load_shap, mock_mlflow_client, mock_sklearn_load, mock_read_yaml
+):
     mock_read_yaml.return_value = ConfigBox(
         {"model_registry": {"name": "test_model", "stage": "Production"}}
     )
@@ -18,8 +21,7 @@ def test_load_model(mock_mlflow_client, mock_sklearn_load, mock_read_yaml):
     mock_version_obj.version = "1"
 
     mock_client_instance = MagicMock()
-
-    mock_client_instance.get_latest_versions.side_effect = lambda name, stages=None: [
+    mock_client_instance.search_model_versions.side_effect = lambda query: [
         mock_version_obj
     ]
     mock_mlflow_client.return_value = mock_client_instance
@@ -31,6 +33,7 @@ def test_load_model(mock_mlflow_client, mock_sklearn_load, mock_read_yaml):
 
     mock_sklearn_load.assert_any_call("models:/test_model/1")
     assert model == expected_model
+    mock_load_shap.assert_called()
 
 
 @patch("src.inference.predict.load_model")
